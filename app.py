@@ -47,10 +47,6 @@ if "app_data" not in st.session_state:
     }
 
 # --- BİREBİR ÜST BİLGİ ŞERİDİ (TEMA VE KURLAR) ---
-# Hataya sebep olan CSS tırnak yapısı Python standart formatına uygun hale getirildi
-st.markdown(
-    "<style>.main { background-color: #0e1117; color: #ffffff; } .stButton>button { background-color: #ff4b4b; color: white; border-radius: 6px; font-weight: bold; } .invoice-box { background-color: #1e2430; padding: 25px; border-radius: 12px; border-left: 5px solid #ff4b4b; margin-bottom: 20px; } .total-box { background-color: #262730; padding: 15px; border-radius: 8px; text-align: right; font-size: 20px; font-weight: bold; border: 1px solid #444; }</style>", 
-            unsafe_allowed_html=True)
 
 
 # Üst Sağ Para Birimi Seçici Simülasyonu
