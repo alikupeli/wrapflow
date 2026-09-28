@@ -2,22 +2,18 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# Sayfa Ayarları ve Tema Zorlaması
+# Ekran Ayarları (Geniş Ekran Stüdyo Modu)
 st.set_page_config(
-    page_title="WrapFlow Proforma v1.2.0", 
+    page_title="WrapFlow Proforma - Araç Kaplama & PPF", 
     page_icon="🚗", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Gönderilen Orijinal JSON Verisinin Eksiksiz Entegrasyonu (Session State Kontrolü)
+# Orijinal JSON Veri Tabanı Entegrasyonu (Session State Kontrolü)
 if "app_data" not in st.session_state:
     st.session_state.app_data = {
-      "appName": "WrapFlow Proforma Araç Kaplama & PPF",
-      "version": "1.2.0",
-      "backupDate": "28.09.2026 20:12:53",
       "invoice": {
-        "id": "inv-initial-01",
         "invoiceNo": "PRF-2026-0042",
         "invoiceDate": "2026-09-28",
         "customer": {
@@ -32,188 +28,253 @@ if "app_data" not in st.session_state:
           "plate": "34 PR 911",
           "brand": "Porsche",
           "model": "911 GT3 RS",
-          "materialType": "TİP5",
-          "applicationDate": "2026-09-28"
+          "materialType": "TİP5"
         },
-        "parts": [],
-        "currency": "TRY",
-        "discountRate": 0,
-        "discountAmount": 0,
+        "parts": [], # [ { "partName": "Sol Ön Çamurluk", "applications": [...] } ]
+        "discountAmount": 440.00,
         "taxRate": 20,
-        "additionalNotes": "Araç kabulünde ön kaputta 1 adet mikro taş izi tespit edilmiş olup, kaplama öncesi lokal rötuş uygulanacaktır. Sağ ön kapıya şerit ve logo uygulaması dahildir.",
-        "workshop": {
-          "name": "APEX WRAP STUDIO & PPF CENTER",
-          "subtitle": "Profesyonel Araç Koruma, Renk Değişimi ve Detaylandırma Merkezi",
-          "phone": "+90 (212) 555 44 33 / +90 (532) 777 88 99",
-          "email": "iletisim@apexwrap.com.tr",
-          "address": "Oto Sanayi Sitesi 4. Blok No: 28 Maslak / İstanbul",
-          "taxInfo": "Maslak V.D. - 1234567890 | Tic. Sicil: 987654",
-          "bankAccount": "TR12 0006 2000 1234 5678 9012 34 (Garanti BBVA - Apex Wrap Ltd.)",
-          "terms": [
-            "Uygulama sonrası ilk 7-10 gün araç basınçlı suyla yıkanmamalıdır.",
-            "15. iş gününde ücretsiz kontrol ve kenar bitiş sabitleme randevusu önerilir.",
-            "İşbu form iş onay belgesi ve proforma fatura niteliğindedir."
-          ]
-        },
-        "exchangeRates": {
-          "USD_TRY": 48.9485,
-          "EUR_TRY": 55.7274,
-          "GBP_TRY": 64.7815,
-          "lastUpdated": "19:56",
-          "isManualOverride": False
-        }
+        "additionalNotes": "Araç kabulünde ön kaputta 1 adet mikro taş izi tespit edilmiş olup, kaplama öncesi lokal rötuş uygulanacaktır. Sağ ön kapıya şerit ve logo uygulaması dahildir."
       },
       "materials": [
-        {"name": "SAĞ DİREK KAPLAMA", "brand": "Standart", "category": "CAST FOLYO KAPLAMA", "tierPrices": {"5500": 0, "TİP5": 0, "CAST": 100, "UV BASKI": 0}, "defaultPrice": 50, "id": "mat-1"},
-        {"name": "MAVİ ŞERİT", "brand": "Standart", "category": "KAPLAMA", "tierPrices": {"5500": 25, "TİP5": 150, "CAST": 0, "UV BASKI": 0}, "defaultPrice": 50, "id": "mat-2"},
-        {"name": "POLİS YAZI", "brand": "Standart", "category": "KAPLAMA", "tierPrices": {"5500": 10, "TİP5": 35, "CAST": 0, "UV BASKI": 0}, "defaultPrice": 50, "id": "mat-3"}
+        {"name": "SAĞ DİREK KAPLAMA", "category": "CAST FOLYO KAPLAMA", "tierPrices": {"5500": 0, "TİP5": 0, "CAST": 100, "UV BASKI": 0}, "defaultPrice": 50},
+        {"name": "MAVİ ŞERİT", "category": "KAPLAMA", "tierPrices": {"5500": 25, "TİP5": 150, "CAST": 0, "UV BASKI": 0}, "defaultPrice": 50},
+        {"name": "POLİS YAZI", "category": "KAPLAMA", "tierPrices": {"5500": 10, "TİP5": 35, "CAST": 0, "UV BASKI": 0}, "defaultPrice": 50}
       ],
-      "bodyParts": [
-        {"id": "bp-hood", "name": "Ön Kaput", "category": "Ön Bölüm"},
-        {"id": "bp-front-bumper", "name": "Ön Tampon", "category": "Ön Bölüm"},
-        {"id": "bp-front-fender-r", "name": "Sağ Ön Çamurluk", "category": "Ön Bölüm"},
-        {"id": "bp-front-fender-l", "name": "Sol Ön Çamurluk", "category": "Ön Bölüm"},
-        {"id": "bp-front-door-r", "name": "Sağ Ön Kapı", "category": "Yan Bölüm"},
-        {"id": "bp-front-door-l", "name": "Sol Ön Kapı", "category": "Yan Bölüm"}
-      ],
-      "materialTypes": ["5500", "TİP5", "CAST", "UV BASKI"]
+      "bodyParts": ["Ön Kaput", "Ön Tampon", "Sağ Ön Çamurluk", "Sol Ön Çamurluk", "Sağ Ön Kapı", "Sol Ön Kapı", "Tavan", "Arka Tampon"],
+      "materialTypes": ["5500", "TİP5", "CAST", "UV BASKI"],
+      "exchangeRates": {"USD_TRY": 48.9485, "EUR_TRY": 55.7274, "GBP_TRY": 64.7815},
+      "active_currency": "TRY"
     }
 
-# --- YAN PANEL (SIDEBAR) ---
-with st.sidebar:
-    st.title("WrapFlow Pro")
-    st.caption(f"Sürüm: {st.session_state.app_data['version']}")
-    st.markdown("---")
-    
-    st.header("💱 Döviz Kurları")
-    usd_rate = st.number_input("USD / TRY", value=st.session_state.app_data["invoice"]["exchangeRates"]["USD_TRY"], format="%.4f")
-    eur_rate = st.number_input("EUR / TRY", value=st.session_state.app_data["invoice"]["exchangeRates"]["EUR_TRY"], format="%.4f")
-    st.session_state.app_data["invoice"]["exchangeRates"]["USD_TRY"] = usd_rate
-    st.session_state.app_data["invoice"]["exchangeRates"]["EUR_TRY"] = eur_rate
-    
-    st.markdown("---")
-    st.header("⚙️ Fiyat Tanımlama")
-    with st.expander("➕ Yeni Malzeme/İş Ekle"):
-        new_mat_name = st.text_input("Malzeme veya İş Adı")
-        new_mat_cat = st.text_input("Kategori")
-        new_price_5500 = st.number_input("5500 Fiyatı ($)", value=0.0)
-        new_price_tip5 = st.number_input("TİP5 Fiyatı ($)", value=0.0)
-        new_price_cast = st.number_input("CAST Fiyatı ($)", value=0.0)
-        
-        if st.button("Malzemeyi Listeye Kaydet"):
-            if new_mat_name:
-                st.session_state.app_data["materials"].append({
-                    "name": new_mat_name,
-                    "brand": "Standart",
-                    "category": new_mat_cat,
-                    "tierPrices": {"5500": new_price_5500, "TİP5": new_price_tip5, "CAST": new_price_cast, "UV BASKI": 0},
-                    "defaultPrice": 50,
-                    "id": f"mat-custom"
-                })
-                st.success("Malzeme eklendi!")
-                st.rerun()
+# --- BİREBİR ÜST BİLGİ ŞERİDİ (TEMA VE KURLAR) ---
+st.markdown(
+    f"""
+    <div style="background-color:#1a1c23; padding:10px; border-radius:6px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333;">
+        <div style="font-size:13px; color:#aaa;">
+            <span style="color:#00ffcc; font-weight:bold;">● CANLI PİYASA KURLARI:</span> &nbsp;&nbsp; 
+            <b>USD/TL:</b> {st.session_state.app_data['exchangeRates']['USD_TRY']:.2f} &nbsp;&nbsp;|&nbsp;&nbsp; 
+            <b>EUR/TL:</b> {st.session_state.app_data['exchangeRates']['EUR_TRY']:.2f} &nbsp;&nbsp;|&nbsp;&nbsp; 
+            <b>GBP/TL:</b> {st.session_state.app_data['exchangeRates']['GBP_TRY']:.2f}
+        </div>
+        <div style="font-size:12px; color:#888;">
+            <b>WrapFlow Proforma</b> v1.2.0 | Apex Wrap Studio
+        </div>
+    </div>
+    """, 
+    unsafe_allowed_html=True
+)
 
-# --- ANA EKRAN ---
-st.title(f"🚗 {st.session_state.app_data['invoice']['workshop']['name']}")
-st.caption(st.session_state.app_data['invoice']['workshop']['subtitle'])
-
-# 1. Müşteri & Araç Düzenleme
-with st.container():
-    st.subheader("📝 Müşteri & Araç Bilgilerini Düzenle")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        inv_no = st.text_input("Fatura / Proforma No", value=st.session_state.app_data["invoice"]["invoiceNo"])
-        cust_name = st.text_input("Müşteri Adı Soyadı", value=st.session_state.app_data["invoice"]["customer"]["name"])
-    with c2:
-        v_plate = st.text_input("Araç Plakası", value=st.session_state.app_data["invoice"]["vehicle"]["plate"])
-        v_brand = st.text_input("Araç Markası", value=st.session_state.app_data["invoice"]["vehicle"]["brand"])
-    with c3:
-        v_model = st.text_input("Araç Modeli", value=st.session_state.app_data["invoice"]["vehicle"]["model"])
-        tax_rate = st.number_input("KDV Oranı (%)", value=st.session_state.app_data["invoice"]["taxRate"])
-
-    st.session_state.app_data["invoice"]["invoiceNo"] = inv_no
-    st.session_state.app_data["invoice"]["customer"]["name"] = cust_name
-    st.session_state.app_data["invoice"]["vehicle"]["plate"] = v_plate
-    st.session_state.app_data["invoice"]["vehicle"]["brand"] = v_brand
-    st.session_state.app_data["invoice"]["vehicle"]["model"] = v_model
-    st.session_state.app_data["invoice"]["taxRate"] = tax_rate
+# Üst Sağ Para Birimi Seçici Simülasyonu
+col_title, col_curr = st.columns([3, 1])
+with col_title:
+    st.title("🚗 WrapFlow İş Emri & Teklif Oluşturucu")
+with col_curr:
+    selected_currency = st.radio("Para Birimi", ["₺ TL", "$ USD", "€ EUR"], horizontal=True)
+    st.session_state.app_data["active_currency"] = selected_currency.split(" ")[1]
 
 st.markdown("---")
 
-# 2. Malzeme Seçim ve Ekleme
-with st.container():
-    st.subheader("🛠️ Parça Uygulaması ve Malzeme Seçimi")
-    col_p, col_m, col_t, col_q = st.columns(4)
-    
-    with col_p:
-        part_options = [p["name"] for p in st.session_state.app_data["bodyParts"]]
-        selected_part = st.selectbox("Uygulanacak Araç Parçası", part_options)
-    with col_m:
-        mat_options = [m["name"] for m in st.session_state.app_data["materials"]]
-        selected_mat = st.selectbox("Kullanılacak Malzeme / İşçilik", mat_options)
-    with col_t:
-        selected_type = st.selectbox("Malzeme Türü (Tier)", st.session_state.app_data["materialTypes"])
-    with col_q:
-        qty = st.number_input("Adet / Adetler", min_value=1, value=1)
-        
-    notes = st.text_input("Özel durum notu (İsteğe bağlı)")
-    
-    if st.button("⚡ Parçayı Proformaya Ekle", use_container_width=True):
-        mat_obj = next(m for m in st.session_state.app_data["materials"] if m["name"] == selected_mat)
-        base_usd = mat_obj["tierPrices"].get(selected_type, 0)
-        if base_usd == 0:
-            base_usd = mat_obj["defaultPrice"]
-            
-        calculated_price_try = base_usd * usd_rate
-        
-        new_part_entry = {
-            "partName": selected_part,
-            "applications": [{
-                "name": selected_mat,
-                "materialType": selected_type,
-                "price": calculated_price_try,
-                "quantity": qty,
-                "notes": notes if notes else "Standart"
-            }]
-        }
-        st.session_state.app_data["invoice"]["parts"].append(new_part_entry)
-        st.toast(f"{selected_part} listeye eklendi!")
+# --- 1. ARAÇ & MÜŞTERİ KÜNYESİ (GÖRSELDEKİ BİRİNCİ BLOK) ---
+st.subheader("📋 Araç & Müşteri Künyesi")
+c1, c2, c3 = st.columns(3)
 
-# --- FATURA ÖNİZLEME ---
+with c1:
+    st.markdown("**👤 MÜŞTERİ BİLGİLERİ**")
+    cust_name = st.text_input("Müşteri Adı / Firma Ünvanı *", value=st.session_state.app_data["invoice"]["customer"]["name"])
+    cust_phone = st.text_input("Telefon Numarası *", value=st.session_state.app_data["invoice"]["customer"]["phone"])
+    cust_city = st.text_input("İl / İlçe", value=st.session_state.app_data["invoice"]["customer"]["city"])
+    cust_tax = st.text_input("VKN / TCKN", value=st.session_state.app_data["invoice"]["customer"]["taxNumber"])
+
+with c2:
+    st.markdown("**🚘 ARAÇ KÜNYESİ**")
+    v_plate = st.text_input("Araç Plakası *", value=st.session_state.app_data["invoice"]["vehicle"]["plate"])
+    v_brand = st.text_input("Araç Markası *", value=st.session_state.app_data["invoice"]["vehicle"]["brand"])
+    v_model = st.text_input("Model / Paket *", value=st.session_state.app_data["invoice"]["vehicle"]["model"])
+    v_mat_type = st.selectbox("Bağımsız Malzeme & Fiyatlandırma Türü", st.session_state.app_data["materialTypes"], index=1)
+
+with c3:
+    st.markdown("**📅 TARİH & UYGULAMA ZAMANI**")
+    inv_no = st.text_input("Teklif / Proforma No", value=st.session_state.app_data["invoice"]["invoiceNo"])
+    app_date = st.date_input("Uygulama Tarihi", datetime.strptime(st.session_state.app_data["invoice"]["invoiceDate"], "%Y-%m-%d"))
+
+# Künye verilerini güncelleme
+st.session_state.app_data["invoice"]["customer"]["name"] = cust_name
+st.session_state.app_data["invoice"]["customer"]["phone"] = cust_phone
+st.session_state.app_data["invoice"]["customer"]["city"] = cust_city
+st.session_state.app_data["invoice"]["customer"]["taxNumber"] = cust_tax
+st.session_state.app_data["invoice"]["vehicle"]["plate"] = v_plate
+st.session_state.app_data["invoice"]["vehicle"]["brand"] = v_brand
+st.session_state.app_data["invoice"]["vehicle"]["model"] = v_model
+st.session_state.app_data["invoice"]["invoiceNo"] = inv_no
+
 st.markdown("---")
-st.subheader("📋 Dijital Proforma Fatura")
 
-# Üst özet kartları
-c_info1, c_info2 = st.columns(2)
-with c_info1:
-    st.info(f"**Müşteri:** {st.session_state.app_data['invoice']['customer']['name']} | **Fatura No:** {st.session_state.app_data['invoice']['invoiceNo']}")
-with c_info2:
-    st.success(f"**Araç:** {st.session_state.app_data['invoice']['vehicle']['brand']} {st.session_state.app_data['invoice']['vehicle']['model']} [{st.session_state.app_data['invoice']['vehicle']['plate']}]")
+# --- KÜTÜPHANE YÖNETİM PANELİ (YANDAN AÇILIR PANEL YERİNE BURADA) ---
+with st.expander("⚙️ Malzeme Kütüphanesi ve Fiyat Tanımlama Odası (Ekle/Çıkar/Düzenle)"):
+    st.markdown("Buradan eklediğiniz malzemeler aşağıdaki dinamik listelerde anında görünür.")
+    mat_df = pd.DataFrame([
+        {
+            "Malzeme Adı": m["name"],
+            "Kategori": m["category"],
+            "5500 Fiyat ($)": m["tierPrices"]["5500"],
+            "TİP5 Fiyat ($)": m["tierPrices"]["TİP5"],
+            "CAST Fiyat ($)": m["tierPrices"]["CAST"]
+        } for m in st.session_state.app_data["materials"]
+    ])
+    st.dataframe(mat_df, use_container_width=True)
+    
+    cx1, cx2, cx3, cx4, cx5 = st.columns(5)
+    with cx1: new_m_name = st.text_input("Yeni Malzeme Adı")
+    with cx2: new_m_cat = st.text_input("Kategori Türü")
+    with cx3: p_5500 = st.number_input("5500 ($)", value=0.0)
+    with cx4: p_tip5 = st.number_input("TİP5 ($)", value=0.0)
+    with cx5: p_cast = st.number_input("CAST ($)", value=0.0)
+    
+    if st.button("➕ Yeni Malzemeyi Kütüphaneye Kaydet"):
+        if new_m_name:
+            st.session_state.app_data["materials"].append({
+                "name": new_m_name,
+                "category": new_m_cat,
+                "tierPrices": {"5500": p_5500, "TİP5": p_tip5, "CAST": p_cast, "UV BASKI": 0},
+                "defaultPrice": 50
+            })
+            st.success("Malzeme kütüphaneye eklendi!")
+            st.rerun()
+
+st.markdown("---")
+
+# --- 2. DİNAMİK PARÇA VE İŞLEM EKLEME MOTORU (GÖRSELDEKİ İKİNCİ BLOK) ---
+st.subheader("🛠️ Araç Parçaları & Yapılacak İşlemler Listesi")
+st.caption("Kaporta parçalarını seçerek; her parçaya birden çok malzemeyi dilediğiniz tarife veya fiyatla tanımlayabilirsiniz.")
+
+col_sel_part, col_btn_add = st.columns([3, 1])
+with col_sel_part:
+    active_part = st.selectbox("Kütüphaneden Kaporta Parçası Seç...", st.session_state.app_data["bodyParts"])
+with col_btn_add:
+    st.write(" ") # Hizalama boşluğu
+    if st.button("➕ Parçayı Teklife Ekle", use_container_width=True):
+        # Eğer bu parça daha önce eklenmediyse fatura listesine boş olarak ekle
+        if not any(p["partName"] == active_part for p in st.session_state.app_data["invoice"]["parts"]):
+            st.session_state.app_data["invoice"]["parts"].append({
+                "partName": active_part,
+                "applications": []
+            })
+            st.rerun()
+
+# --- 3. DİNAMİK LİSTELEME VE HESAPLAMA ALANI (GÖRSELDEKİ SOL ÖN ÇAMURLUK ÖRNEĞİ) ---
+subtotal = 0.0
 
 if st.session_state.app_data["invoice"]["parts"]:
-    # Eklenen Parçaların Listelenmesi
-    table_data = []
-    subtotal = 0.0
-    
-    for p in st.session_state.app_data["invoice"]["parts"]:
-        for app in p["applications"]:
-            item_total = app["price"] * app["quantity"]
-            subtotal += item_total
-            table_data.append({
-                "Uygulanan Parça": p["partName"],
-                "Hizmet/Malzeme": app["name"],
-                "Tür (Tier)": app["materialType"],
-                "Adet": app["quantity"],
-                "Birim Fiyat": f"{app['price']:.2f} TL",
-                "Toplam Tutar": f"{item_total:.2f} TL",
-                "Notlar": app["notes"]
-            })
+    for part_idx, part_item in enumerate(st.session_state.app_data["invoice"]["parts"]):
+        st.markdown(f"### 🔲 {part_item['partName']}")
+        
+        # Parçanın altındaki işlemler için dinamik form satırları
+        with st.container():
+            # Başlık Satırı
+            h1, h2, h3, h4, h5, h6 = st.columns([3, 2, 2, 1, 2, 2])
+            h1.write("<small>UYGULANAN MALZEME / İŞLEM</small>", unsafe_allowed_html=True)
+            h2.write("<small>MALZEME CİNSİ (TIER)</small>", unsafe_allowed_html=True)
+            h3.write("<small>BİRİM FİYAT ($)</small>", unsafe_allowed_html=True)
+            h4.write("<small>MİKTAR</small>", unsafe_allowed_html=True)
+            h5.write("<small>TUTAR (TL)</small>", unsafe_allowed_html=True)
+            h6.write("<small>NOT / AÇIKLAMA</small>", unsafe_allowed_html=True)
             
-    st.dataframe(pd.DataFrame(table_data), use_container_width=True)
+            # Mevcut kayıtlı alt uygulamaları listeleme
+            rem_idx = None
+            for app_idx, app in enumerate(part_item["applications"]):
+                c_m, c_c, c_bf, c_q, c_t, c_n = st.columns([3, 2, 2, 1, 2, 2])
+                c_m.write(f"**{app['name']}**")
+                c_c.write(f"`{app['materialType']}`")
+                c_bf.write(f"${app['usd_base']:.2f}")
+                c_q.write(str(app['quantity']))
+                
+                # Anlık Döviz Kuru Çevirici (Dolar Fiyatını TL'ye Çevirir)
+                calculated_tl = app['usd_base'] * st.session_state.app_data["exchangeRates"]["USD_TRY"] * app['quantity']
+                subtotal += calculated_tl
+                
+                c_t.write(f"**₺{calculated_tl:,.2f}**")
+                c_n.write(app['notes'])
+            
+            # Her parçanın altına yeni malzeme/satır ekleme bölümü (Görseldeki sarı buton alanı)
+            with st.expander(f"➕ {part_item['partName']} İçin Yeni Malzeme / İşlem Satırı Ekle"):
+                s1, s2, s3, s4 = st.columns(4)
+                with s1:
+                    sel_mat = st.selectbox("Malzeme Seç", [m["name"] for m in st.session_state.app_data["materials"]], key=f"mat_{part_idx}")
+                with s2:
+                    sel_type = st.selectbox("Cinsi", st.session_state.app_data["materialTypes"], key=f"type_{part_idx}")
+                with s3:
+                    qty = st.number_input("Miktar", min_value=1, value=1, key=f"qty_{part_idx}")
+                with s4:
+                    note_str = st.text_input("Açıklama", value="Standart", key=f"note_{part_idx}")
+                
+                if st.button("⚡ Malzemeyi Satıra İşle", key=f"btn_{part_idx}"):
+                    # Kütüphaneden fiyat bulma mantığı
+                    mat_obj = next(m for m in st.session_state.app_data["materials"] if m["name"] == sel_mat)
+                    usd_price = mat_obj["tierPrices"].get(sel_type, mat_obj["defaultPrice"])
+                    
+                    if usd_price == 0:
+                        usd_price = mat_obj["defaultPrice"]
+                        
+                    part_item["applications"].append({
+                        "name": sel_mat,
+                        "materialType": sel_type,
+                        "usd_base": usd_price,
+                        "quantity": qty,
+                        "notes": note_str
+                    })
+                    st.toast("İşlem başarıyla eklendi!")
+                    st.rerun()
+        
+        # Parça Toplamı Hesaplama
+        part_tot = sum(a['usd_base'] * st.session_state.app_data['exchangeRates']['USD_TRY'] * a['quantity'] for a in part_item['applications'])
+        st.markdown(f"<div style='text-align:right; color:#00ffcc; font-weight:bold;'>Parça Toplamı: ₺{part_tot:,.2f}</div>", unsafe_allowed_html=True)
+        st.markdown("---")
+
+# --- 4. MALİYET & FİYATLANDIRMA ÖZETİ (SAĞ ALT KUTU) ---
+st.subheader("📊 Maliyet & Fiyatlandırma Özeti")
+cx_left, cx_right = st.columns(2)
+
+with cx_left:
+    st.markdown("**¼ İŞ EMRİ & ÖZEL NOTLAR (MÜŞTERİ TALEPLERİ / EKSPERTİZ)**")
+    additional_notes = st.text_area("Evrak altında çıkacak özel notlar", value=st.session_state.app_data["invoice"]["additionalNotes"])
+    st.session_state.app_data["invoice"]["additionalNotes"] = additional_notes
+
+with cx_right:
+    st.markdown("<div style='background-color:#1e2430; padding:20px; border-radius:8px;'>", unsafe_allowed_html=True)
+    st.write(f"**Ara Toplam:** ₺{subtotal:,.2f}")
     
-    # Hesaplama alanı
-    discount = st.number_input("İndirim Tutarı (TL)", value=0.0)
+    # İskonto/İndirim Girişi
+    discount = st.number_input("İskonto / İndirim (TL):", value=float(st.session_state.app_data["invoice"]["discountAmount"]))
+    st.session_state.app_data["invoice"]["discountAmount"] = discount
+    
+    # KDV Hesaplama
+    tax_rate = st.session_state.app_data["invoice"]["taxRate"]
     total_before_tax = subtotal - discount
     tax_amount = total_before_tax * (tax_rate / 100)
     grand_total = total_before_tax + tax_amount
     
+    st.write(f"**KDV Oranı (%{tax_rate}):** ₺{tax_amount:,.2f}")
+    st.markdown("---")
+    
+    # Para Birimi Çevirici Motoru
+    active_curr = st.session_state.app_data["active_currency"][0]
+    if "USD" in active_curr:
+        display_total = grand_total / st.session_state.app_data["exchangeRates"]["USD_TRY"]
+        symbol = "\$"
+    elif "EUR" in active_curr:
+        display_total = grand_total / st.session_state.app_data["exchangeRates"]["EUR_TRY"]
+        symbol = "€"
+    else:
+        display_total = grand_total
+        symbol = "₺"
+        
+    st.metric(label="TOPLAM TUTAR", value=f"{symbol}{display_total:,.2f}")
+    st.markdown("</div>", unsafe_allowed_html=True)
+
+# Temizleme Butonu
+if st.session_state.app_data["invoice"]["parts"]:
+    st.markdown("---")
+    if st.button("🗑 Tüm Formu Temizle ve Yeni Araç Kabulü Yap", use_container_width=True):
+        st.session_state.app_data["invoice"]["parts"] = []
+        st.rerun()
+                                                           
