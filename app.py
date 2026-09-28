@@ -47,22 +47,9 @@ if "app_data" not in st.session_state:
     }
 
 # --- BİREBİR ÜST BİLGİ ŞERİDİ (TEMA VE KURLAR) ---
-st.markdown(
-    f"""
-    <div style="background-color:#1a1c23; padding:10px; border-radius:6px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333;">
-        <div style="font-size:13px; color:#aaa;">
-            <span style="color:#00ffcc; font-weight:bold;">● CANLI PİYASA KURLARI:</span> &nbsp;&nbsp; 
-            <b>USD/TL:</b> {st.session_state.app_data['exchangeRates']['USD_TRY']:.2f} &nbsp;&nbsp;|&nbsp;&nbsp; 
-            <b>EUR/TL:</b> {st.session_state.app_data['exchangeRates']['EUR_TRY']:.2f} &nbsp;&nbsp;|&nbsp;&nbsp; 
-            <b>GBP/TL:</b> {st.session_state.app_data['exchangeRates']['GBP_TRY']:.2f}
-        </div>
-        <div style="font-size:12px; color:#888;">
-            <b>WrapFlow Proforma</b> v1.2.0 | Apex Wrap Studio
-        </div>
-    </div>
-    """, 
-    unsafe_allowed_html=True
-)
+# Hataya sebep olan CSS tırnak yapısı Python standart formatına uygun hale getirildi
+st.markdown("<style>.main { background-color: #0e1117; color: #ffffff; } .stButton>button { background-color: #ff4b4b; color: white; border-radius: 6px; font-weight: bold; } .invoice-box { background-color: #1e2430; padding: 25px; border-radius: 12px; border-left: 5px solid #ff4b4b; margin-bottom: 20px; } .total-box { background-color: #262730; padding: 15px; border-radius: 8px; text-align: right; font-size: 20px; font-weight: bold; border: 1px solid #444; }</style>", unsafe_allowed_html=True)
+
 
 # Üst Sağ Para Birimi Seçici Simülasyonu
 col_title, col_curr = st.columns([3, 1])
