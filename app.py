@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# Sayfa Ayarları ve Tema Zorlaması (Koyu Premium Tema)
+# Sayfa Ayarları ve Tema Zorlaması
 st.set_page_config(
     page_title="WrapFlow Proforma v1.2.0", 
     page_icon="🚗", 
@@ -79,9 +79,6 @@ if "app_data" not in st.session_state:
       "materialTypes": ["5500", "TİP5", "CAST", "UV BASKI"]
     }
 
-# Hataya sebep olan CSS tırnak yapısı güvenli hale getirildi
-st.markdown("<style>.main { background-color: #0e1117; color: #ffffff; } .stButton>button { background-color: #ff4b4b; color: white; border-radius: 6px; font-weight: bold; } .invoice-box { background-color: #1e2430; padding: 25px; border-radius: 12px; border-left: 5px solid #ff4b4b; margin-bottom: 20px; } .total-box { background-color: #262730; padding: 15px; border-radius: 8px; text-align: right; font-size: 20px; font-weight: bold; border: 1px solid #444; }</style>", unsafe_allowed_html=True)
-
 # --- YAN PANEL (SIDEBAR) ---
 with st.sidebar:
     st.title("WrapFlow Pro")
@@ -111,7 +108,7 @@ with st.sidebar:
                     "category": new_mat_cat,
                     "tierPrices": {"5500": new_price_5500, "TİP5": new_price_tip5, "CAST": new_price_cast, "UV BASKI": 0},
                     "defaultPrice": 50,
-                    "id": f"mat-custom-{datetime.now().microsecond}"
+                    "id": f"mat-custom"
                 })
                 st.success("Malzeme eklendi!")
                 st.rerun()
@@ -121,7 +118,8 @@ st.title(f"🚗 {st.session_state.app_data['invoice']['workshop']['name']}")
 st.caption(st.session_state.app_data['invoice']['workshop']['subtitle'])
 
 # 1. Müşteri & Araç Düzenleme
-with st.expander("📝 1. Müşteri & Araç Bilgilerini Düzenle", expanded=True):
+with st.container():
+    st.subheader("📝 Müşteri & Araç Bilgilerini Düzenle")
     c1, c2, c3 = st.columns(3)
     with c1:
         inv_no = st.text_input("Fatura / Proforma No", value=st.session_state.app_data["invoice"]["invoiceNo"])
@@ -140,8 +138,11 @@ with st.expander("📝 1. Müşteri & Araç Bilgilerini Düzenle", expanded=True
     st.session_state.app_data["invoice"]["vehicle"]["model"] = v_model
     st.session_state.app_data["invoice"]["taxRate"] = tax_rate
 
+st.markdown("---")
+
 # 2. Malzeme Seçim ve Ekleme
-with st.expander("🛠️ 2. Parça Uygulaması ve Malzeme Seçimi", expanded=True):
+with st.container():
+    st.subheader("🛠️ Parça Uygulaması ve Malzeme Seçimi")
     col_p, col_m, col_t, col_q = st.columns(4)
     
     with col_p:
@@ -178,26 +179,41 @@ with st.expander("🛠️ 2. Parça Uygulaması ve Malzeme Seçimi", expanded=Tr
         st.session_state.app_data["invoice"]["parts"].append(new_part_entry)
         st.toast(f"{selected_part} listeye eklendi!")
 
-# --- FURA ÖNİZLEME ---
+# --- FATURA ÖNİZLEME ---
 st.markdown("---")
-st.subheader("📋 Dijital Proforma Fatura Önizleme")
+st.subheader("📋 Dijital Proforma Fatura")
+
+# Üst özet kartları
+c_info1, c_info2 = st.columns(2)
+with c_info1:
+    st.info(f"**Müşteri:** {st.session_state.app_data['invoice']['customer']['name']} | **Fatura No:** {st.session_state.app_data['invoice']['invoiceNo']}")
+with c_info2:
+    st.success(f"**Araç:** {st.session_state.app_data['invoice']['vehicle']['brand']} {st.session_state.app_data['invoice']['vehicle']['model']} [{st.session_state.app_data['invoice']['vehicle']['plate']}]")
 
 if st.session_state.app_data["invoice"]["parts"]:
-    # HTML Önizleme Kutusu
-    invoice_header_html = f"""
-    <div class="invoice-box">
-        <div style="display: flex; justify-content: space-between;">
-            <div>
-                <h3 style="color:#ff4b4b; margin:0;">{st.session_state.app_data['invoice']['workshop']['name']}</h3>
-                <p style="font-size:12px; margin:2px 0; color:#aaa;">{st.session_state.app_data['invoice']['workshop']['subtitle']}</p>
-            </div>
-            <div style="text-align: right;">
-                <h4 style="margin:0;">PROFORMA FATURA</h4>
-                <p style="margin:2px 0; font-weight:bold; color:#ff4b4b;">No: {st.session_state.app_data['invoice']['invoiceNo']}</p>
-            </div>
-        </div>
-    </div>
-    """
-    st.markdown(invoice_header_html, unsafe_allowed_html=True)
-    
     # Eklenen Parçaların Listelenmesi
+    table_data = []
+    subtotal = 0.0
+    
+    for p in st.session_state.app_data["invoice"]["parts"]:
+        for app in p["applications"]:
+            item_total = app["price"] * app["quantity"]
+            subtotal += item_total
+            table_data.append({
+                "Uygulanan Parça": p["partName"],
+                "Hizmet/Malzeme": app["name"],
+                "Tür (Tier)": app["materialType"],
+                "Adet": app["quantity"],
+                "Birim Fiyat": f"{app['price']:.2f} TL",
+                "Toplam Tutar": f"{item_total:.2f} TL",
+                "Notlar": app["notes"]
+            })
+            
+    st.dataframe(pd.DataFrame(table_data), use_container_width=True)
+    
+    # Hesaplama alanı
+    discount = st.number_input("İndirim Tutarı (TL)", value=0.0)
+    total_before_tax = subtotal - discount
+    tax_amount = total_before_tax * (tax_rate / 100)
+    grand_total = total_before_tax + tax_amount
+    
