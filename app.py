@@ -225,41 +225,33 @@ with cx_left:
     st.session_state.app_data["invoice"]["additionalNotes"] = additional_notes
 
 with cx_right:
-    st.markdown("<div style='background-color:#1e2430; padding:20px; border-radius:8px;'>", unsafe_allowed_html=True)
-    st.write(f"**Ara Toplam:** ₺{subtotal:,.2f}")
-    
-    # İskonto/İndirim Girişi
-    discount = st.number_input("İskonto / İndirim (TL):", value=float(st.session_state.app_data["invoice"]["discountAmount"]))
-    st.session_state.app_data["invoice"]["discountAmount"] = discount
-    
-    # KDV Hesaplama
-    tax_rate = st.session_state.app_data["invoice"]["taxRate"]
-    total_before_tax = subtotal - discount
-    tax_amount = total_before_tax * (tax_rate / 100)
-    grand_total = total_before_tax + tax_amount
-    
-    st.write(f"**KDV Oranı (%{tax_rate}):** ₺{tax_amount:,.2f}")
-    st.markdown("---")
-    
-    # Para Birimi Çevirici Motoru
-    active_curr = st.session_state.app_data["active_currency"][0]
-    if "USD" in active_curr:
-        display_total = grand_total / st.session_state.app_data["exchangeRates"]["USD_TRY"]
-        symbol = "\$"
-    elif "EUR" in active_curr:
-        display_total = grand_total / st.session_state.app_data["exchangeRates"]["EUR_TRY"]
-        symbol = "€"
-    else:
-        display_total = grand_total
-        symbol = "₺"
+    # Hatalı div satırları silindi, yerine Streamlit'in kendi çökmeyen kutu yapısı (container) eklendi
+    with st.container(border=True):
+        st.write(f"**Ara Toplam:** ₺{subtotal:,.2f}")
         
-    st.metric(label="TOPLAM TUTAR", value=f"{symbol}{display_total:,.2f}")
-    st.markdown("</div>", unsafe_allowed_html=True)
-
-# Temizleme Butonu
-if st.session_state.app_data["invoice"]["parts"]:
-    st.markdown("---")
-    if st.button("🗑 Tüm Formu Temizle ve Yeni Araç Kabulü Yap", use_container_width=True):
-        st.session_state.app_data["invoice"]["parts"] = []
-        st.rerun()
-                                                           
+        # İskonto/İndirim Girişi
+        discount = st.number_input("İskonto / İndirim (TL):", value=float(st.session_state.app_data["invoice"]["discountAmount"]))
+        st.session_state.app_data["invoice"]["discountAmount"] = discount
+        
+        # KDV Hesaplama
+        tax_rate = st.session_state.app_data["invoice"]["taxRate"]
+        total_before_tax = subtotal - discount
+        tax_amount = total_before_tax * (tax_rate / 100)
+        grand_total = total_before_tax + tax_amount
+        
+        st.write(f"**KDV Oranı (%{tax_rate}):** ₺{tax_amount:,.2f}")
+        st.markdown("---")
+        
+        # Para Birimi Çevirici Motoru
+        active_curr = st.session_state.app_data["active_currency"]
+        if "USD" in active_curr:
+            display_total = grand_total / st.session_state.app_data["exchangeRates"]["USD_TRY"]
+            symbol = "$"
+        elif "EUR" in active_curr:
+            display_total = grand_total / st.session_state.app_data["exchangeRates"]["EUR_TRY"]
+            symbol = "€"
+        else:
+            display_total = grand_total
+            symbol = "₺"
+            
+        st.metric(label="TOPLAM TUTAR (KDV DAHİL)", value=f"{symbol}{display_total:,.2f}")
